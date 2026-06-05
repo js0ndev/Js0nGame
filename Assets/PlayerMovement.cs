@@ -1,3 +1,4 @@
+using NUnit.Framework;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -13,8 +14,14 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float runJump = 6f;
     private float forceJump;
 
+    [Header("Pés no chão")]
+    [SerializeField] private Transform groundCheck;
+    [SerializeField] private float checkRadius = 0.2f;
+    [SerializeField] private LayerMask groundLayer;
+
     [Header("GameOver")]
     [SerializeField] private float deathLevel = -10f;
+    [SerializeField] private GameObject gameOverI;
     private bool isDead;
 
     private Rigidbody2D rb;
@@ -28,9 +35,11 @@ public class PlayerMovement : MonoBehaviour
 
     public void Update()
     {
+        footGrounded();
         HandleInput();
         HandleShift();
         HandleJump();
+        CheckDeath();
     }
 
     public void FixedUpdate()
@@ -58,21 +67,13 @@ public class PlayerMovement : MonoBehaviour
             shiftPressed = false;
         }
     }
-    public void OnCollisionEnter2D(Collision2D collision)
+    public void footGrounded()
     {
-        if(collision.gameObject.layer == LayerMask.NameToLayer("Chao"))
-        {
-            isGrounded = true;
-            Debug.Log("Tocou o chão");
-        }
-    }
-    public void OnCollisionExit2D(Collision2D collision)
-    {
-        if(collision.gameObject.layer == LayerMask.NameToLayer("Chao"))
-        {
-            isGrounded = false;
-            Debug.Log("Saiu do chão");
-        }
+        isGrounded = Physics2D.OverlapCircle(
+            groundCheck.position,
+            checkRadius,
+            groundLayer
+        );
     }
     public void HandleJump()
     {
@@ -80,6 +81,26 @@ public class PlayerMovement : MonoBehaviour
         {
             forceJump = shiftPressed ? runJump : walkJump;
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, forceJump);
+        }
+    }
+    public void CheckDeath()
+    {
+        if(isDead) return;
+
+        if (rb.position.y < deathLevel)
+        {
+        isDead = true;
+        Debug.Log("Morreu");
+        GameOver();
+        }
+    }
+    public void GameOver()
+    {
+        if(isDead)
+        {
+            Time.timeScale = 0f;
+            Debug.Log("Game Over");
+            gameOverI.SetActive(true);
         }
     }
 }
