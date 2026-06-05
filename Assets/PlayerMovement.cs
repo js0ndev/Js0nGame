@@ -29,11 +29,13 @@ public class PlayerMovement : MonoBehaviour
     public void Update()
     {
         HandleInput();
+        HandleShift();
+        HandleJump();
     }
 
     public void FixedUpdate()
     {
-        
+        HandleMovement();
     }
 
     public void HandleInput()
@@ -42,6 +44,42 @@ public class PlayerMovement : MonoBehaviour
     }
     public void HandleMovement()
     {
-        rb.linearVelocity = new Vector2(moveSpeed * horizontalInput, rb.linearVelocity.x);
+        moveSpeed = shiftPressed ? runSpeed : walkSpeed;
+        rb.linearVelocity = new Vector2(moveSpeed * horizontalInput, rb.linearVelocity.y);
+    }
+    public void HandleShift()
+    {
+        if(Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift))
+        {
+            shiftPressed = true;
+        }
+        if(Input.GetKeyUp(KeyCode.LeftShift) || Input.GetKeyUp(KeyCode.RightShift))
+        {
+            shiftPressed = false;
+        }
+    }
+    public void OnCollisionEnter2D(Collision2D collision)
+    {
+        if(collision.gameObject.layer == LayerMask.NameToLayer("Chao"))
+        {
+            isGrounded = true;
+            Debug.Log("Tocou o chão");
+        }
+    }
+    public void OnCollisionExit2D(Collision2D collision)
+    {
+        if(collision.gameObject.layer == LayerMask.NameToLayer("Chao"))
+        {
+            isGrounded = false;
+            Debug.Log("Saiu do chão");
+        }
+    }
+    public void HandleJump()
+    {
+        if(isGrounded && Input.GetKeyDown(KeyCode.Space))
+        {
+            forceJump = shiftPressed ? runJump : walkJump;
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, forceJump);
+        }
     }
 }
