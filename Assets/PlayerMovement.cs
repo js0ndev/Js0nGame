@@ -21,7 +21,7 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("GameOver")]
     [SerializeField] private float deathLevel = -10f;
-    [SerializeField] private GameObject gameOverI;
+    [SerializeField] private GameObject gameOverPanel;
     private bool isDead;
 
     private Rigidbody2D rb;
@@ -31,6 +31,10 @@ public class PlayerMovement : MonoBehaviour
     public void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+    }
+    public void Start()
+    {
+        gameOverPanel.SetActive(false);
     }
 
     public void Update()
@@ -100,7 +104,8 @@ public class PlayerMovement : MonoBehaviour
         {
             Time.timeScale = 0f;
             Debug.Log("Game Over");
-            gameOverI.SetActive(true);
+            gameOverPanel.SetActive(true);
         }
     }
+
 }
