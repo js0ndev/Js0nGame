@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -23,13 +24,23 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private GameObject gameOverPanel;
     private bool isDead;
 
+    [Header("Ataque")]
+    [SerializeField] private Transform attackPoint;
+    [SerializeField] private float attackRadius = 1f;
+    [SerializeField] private LayerMask enemyLayer;
+    [SerializeField] private GameObject attackSprite;
+    private bool isAttacking;
+
+
     private Rigidbody2D rb;
+    private Vector3 originalScale;
     private bool isGrounded;
     private float horizontalInput;
 
     public void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        originalScale = transform.localScale;
     }
     public void Start()
     {
@@ -44,6 +55,7 @@ public class PlayerMovement : MonoBehaviour
         HandleShift();
         HandleJump();
         CheckDeath();
+        HandleAttack();
     }
 
     public void FixedUpdate()
@@ -109,8 +121,37 @@ public class PlayerMovement : MonoBehaviour
     }
     public void InverterPlayer()
     {
-        if(horizontalInput > 0) transform.localScale = new Vector3(0.1312f,0.1312f,0.1312f);
-        if(horizontalInput < 0) transform.localScale = new Vector3 (-0.1312f,0.1312f,0.1312f);
+        if(horizontalInput > 0)
+        transform.localScale = new Vector3(Mathf.Abs(originalScale.x), originalScale.y, originalScale.z);
+        if(horizontalInput < 0)
+        transform.localScale = new Vector3(-Mathf.Abs(originalScale.x), originalScale.y, originalScale.z);
+    }
+    public void HandleAttack()
+    {
+        if(Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.C) && !isAttacking)
+        {
+            StartCoroutine(Attack());
+        }
+    }
+    IEnumerator Attack()
+    {
+        isAttacking = true;
+        Debug.Log("Atacou");
+        attackSprite.SetActive(true);
+
+        Collider2D[] enemies = Physics2D.OverlapCircleAll(
+            attackPoint.position,
+            attackRadius,
+            enemyLayer
+        );
+        foreach(Collider2D enemy in enemies)
+        {
+            Destroy(enemy.gameObject);
+        }
+        yield return new WaitForSeconds(0.2f);
+        attackSprite.SetActive(false);
+        isAttacking = false;
+        Debug.Log("Parou de Atacar");
     }
 
 }
