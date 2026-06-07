@@ -1,4 +1,3 @@
-using NUnit.Framework;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -39,6 +38,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void Update()
     {
+        InverterPlayer();
         footGrounded();
         HandleInput();
         HandleShift();
@@ -106,6 +106,11 @@ public class PlayerMovement : MonoBehaviour
             Debug.Log("Game Over");
             gameOverPanel.SetActive(true);
         }
+    }
+    public void InverterPlayer()
+    {
+        if(horizontalInput > 0) transform.localScale = new Vector3(0.1312f,0.1312f,0.1312f);
+        if(horizontalInput < 0) transform.localScale = new Vector3 (-0.1312f,0.1312f,0.1312f);
     }
 
 }
