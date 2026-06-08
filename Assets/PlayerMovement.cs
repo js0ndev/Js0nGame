@@ -128,7 +128,7 @@ public class PlayerMovement : MonoBehaviour
     }
     public void HandleAttack()
     {
-        if(Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.C) && !isAttacking)
+        if((Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.C)) && !isAttacking)
         {
             StartCoroutine(Attack());
         }
@@ -146,7 +146,11 @@ public class PlayerMovement : MonoBehaviour
         );
         foreach(Collider2D enemy in enemies)
         {
-            Destroy(enemy.gameObject);
+            Enemy enemyComponent = enemy.GetComponent<Enemy>();
+            if(enemyComponent != null)
+            {
+                enemyComponent.Die();
+            }
         }
         yield return new WaitForSeconds(0.2f);
         attackSprite.SetActive(false);
