@@ -146,7 +146,12 @@ public class PlayerMovement : MonoBehaviour
         );
         foreach(Collider2D enemy in enemies)
         {
-            Destroy(enemy.gameObject);
+            Enemy enemyScript = enemy.GetComponent<Enemy>();
+
+if(enemyScript != null)
+{
+    enemyScript.Die();
+}
         }
         yield return new WaitForSeconds(0.2f);
         attackSprite.SetActive(false);
